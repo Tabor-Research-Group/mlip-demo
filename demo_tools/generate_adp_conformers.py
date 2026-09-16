@@ -156,7 +156,7 @@ def load_mols(file=DEFAULT_XYZ_FILE):
     return ase.io.read(file, index=":")
 
 
-def visualize(atoms, out_file=None, backend="x3d", metallic=0.9, roughness=0.25, **plot_opts):
+def visualize(atoms, out_file=None, backend="x3d", metallic=0.2, roughness=0.25, **plot_opts):
     """
     Convert an `ase.Atoms` object into a `Molecule` (via
     `McUtils.ExternalPrograms.ASEMolecule` -> `Molecule.from_ase`) and plot
@@ -197,8 +197,8 @@ def visualize(atoms, out_file=None, backend="x3d", metallic=0.9, roughness=0.25,
 
     if out_file is not None:
         figure.savefig(out_file)
-    else:
-        figure.show()
+    # else:
+    #     figure.show()
 
     return figure
 
