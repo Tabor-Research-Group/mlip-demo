@@ -9,15 +9,13 @@ RUN printf '%s\n' \
 
 WORKDIR /home
 
-COPY demo_tools .
-
 ARG CACHEBUST
-COPY environment.yml environment_mace.yml environment_uma.yml cli.py ./
+COPY demo_tools environment.yml environment-mace.yml environment-uma.yml cli.py ./
 
 RUN apt-get update && apt-get -y install --no-install-recommends git gcc g++ && \
     mamba env create -f environment.yml && \
-    mamba env create -f environment_mace.yml && \
-    mamba env create -f environment_uma.yml && \
+    mamba env create -f environment-mace.yml && \
+    mamba env create -f environment-uma.yml && \
     mamba clean --all -afy && \
     find /opt/conda -follow -type f -name '*.a' -delete && \
     find /opt/conda -follow -type f -name '*.pyc' -delete && \
