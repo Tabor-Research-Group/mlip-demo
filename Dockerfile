@@ -12,7 +12,9 @@ WORKDIR /home
 COPY kernels /usr/local/share/jupyter/kernels/
 
 ARG CACHEBUST
-COPY demo_tools environment.yml environment-mace.yml environment-uma.yml cli.py ./
+COPY demo_tools /home/demo_tools
+COPY demo /home/demo
+COPY environment.yml environment-mace.yml environment-uma.yml cli.py ./
 
 RUN apt-get update && apt-get -y install --no-install-recommends git gcc g++ && \
     mamba env create -f environment.yml && \
