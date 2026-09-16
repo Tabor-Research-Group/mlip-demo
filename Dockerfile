@@ -3,11 +3,13 @@ ENV DEBIAN_FRONTEND=noninteractive PATH=/opt/conda/bin:$PATH PYTHONPATH=/home:$P
 
 RUN printf '%s\n' \
     '#!/bin/bash' \
-    'conda run --no-capture-output -n cmcc-rxn jupyter "$@"' \
+    'conda run --no-capture-output -n aimnet2 jupyter "$@"' \
     > /usr/bin/jupyter && \
     chmod +x /usr/bin/jupyter
 
 WORKDIR /home
+
+COPY demo_tools .
 
 ARG CACHEBUST
 COPY environment.yml environment_mace.yml environment_uma.yml cli.py ./
