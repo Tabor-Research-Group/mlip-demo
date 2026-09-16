@@ -9,6 +9,8 @@ RUN printf '%s\n' \
 
 WORKDIR /home
 
+COPY kernels /usr/local/share/jupyter/kernels/
+
 ARG CACHEBUST
 COPY demo_tools environment.yml environment-mace.yml environment-uma.yml cli.py ./
 

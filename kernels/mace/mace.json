@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/opt/conda/envs/mace/bin/python",
+    "-m",
+    "ipykernel_launcher",
+    "-f",
+    "{connection_file}"
+  ],
+  "display_name": "MACE",
+  "language": "python"
+}
