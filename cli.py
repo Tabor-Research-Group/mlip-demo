@@ -52,6 +52,11 @@ def main():
     if not cmd:
         parser.error("Nothing to run.")
 
+    if cmd[0] == 'jupyter':
+        from demo_tools.helpers import configure_demo
+
+        configure_demo()
+
     try:
         return subprocess.call(cmd)
     except FileNotFoundError:

@@ -1,5 +1,6 @@
 import os
 import stat
+import shutil
 
 def configure_cli(target_dir='.', templates_dir=None):
     container = os.environ['SINGULARITY_CONTAINER'] # error out early
@@ -31,6 +32,10 @@ def configure_cli(target_dir='.', templates_dir=None):
 
     return script
 
+def configure_demo(target_dir='.', demo_dir='/home/demo'):
+    shutil.copytree(demo_dir, os.path.join(target_dir, 'demo'))
+
 if __name__ == "__main__":
     import sys
-    configure_cli(*sys.argv[1:])
+    # configure_cli(*sys.argv[1:])
+    configure_demo(*sys.argv[1:])
