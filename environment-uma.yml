@@ -1,0 +1,22 @@
+name: uma
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python>=3.11,<3.14
+  - pip
+  - jupyterlab
+  - pip:
+      - ase
+      - pysisyphus
+      - orjson
+      - mccoygroup-mcutils
+      - mccoygroup-psience
+      - rdkit
+      - --extra-index-url https://download.pytorch.org/whl/cpu
+      - torch==2.8.0
+      - --find-links https://data.pyg.org/whl/torch-2.8.0+cpu.html
+      - torch-cluster
+      - torch-scatter
+      - pymatgen
+      - fairchem-core>2.0
