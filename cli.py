@@ -52,7 +52,7 @@ def main():
     if not cmd:
         parser.error("Nothing to run.")
 
-    if cmd[0] == 'jupyter':
+    if 'jupyter' in cmd:
         from demo_tools.helpers import configure_demo
 
         configure_demo()

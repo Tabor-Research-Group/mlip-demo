@@ -156,7 +156,21 @@ def load_mols(file=DEFAULT_XYZ_FILE):
     return ase.io.read(file, index=":")
 
 
-def visualize(atoms, out_file=None, backend="x3d", metallic=0.2, roughness=0.25, **plot_opts):
+default_visualization_styles = dict(
+    backend='x3d',
+    background='white',
+    navigation={'headlight':True},
+    environment={'reflectionIntensity': 1.0},
+    atom_style={'ambientIntensity': 0.2, 'specularColor': (0.38, 0.38, 0.38), 'shininess': 0.32},
+    bond_style={'ambientIntensity': 0.2, 'specularColor': (0.38, 0.38, 0.38), 'shininess': 0.32},
+    lighting=[
+        {'direction': (-0.45, -0.65, -1.0), 'color': (1.0, 0.98, 0.95),
+         'intensity': 0.2, 'ambientIntensity': 0.16, 'global': True},
+        {'direction': (0.70, 0.20, -1.0), 'color': (0.90, 0.94, 1.0),
+         'intensity': 0.2, 'ambientIntensity': 0.05, 'global': True},
+    ],
+)
+def visualize(atoms, out_file=None, **plot_opts):
     """
     Convert an `ase.Atoms` object into a `Molecule` (via
     `McUtils.ExternalPrograms.ASEMolecule` -> `Molecule.from_ase`) and plot
@@ -182,17 +196,8 @@ def visualize(atoms, out_file=None, backend="x3d", metallic=0.2, roughness=0.25,
     ase_mol = ASEMolecule.from_atoms(atoms)
     mol = Molecule.from_ase(ase_mol)
 
-    metal_style = {
-        "metallic": metallic,
-        "roughness": roughness,
-        "specularity": "white",
-    }
-
     figure = mol.plot(
-        backend=backend,
-        atom_style=metal_style,
-        bond_style=metal_style,
-        **plot_opts
+        **(default_visualization_styles | plot_opts)
     )
 
     if out_file is not None:

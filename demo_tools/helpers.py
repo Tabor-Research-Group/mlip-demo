@@ -33,7 +33,9 @@ def configure_cli(target_dir='.', templates_dir=None):
     return script
 
 def configure_demo(target_dir='.', demo_dir='/home/demo'):
-    shutil.copytree(demo_dir, os.path.join(target_dir, 'demo'))
+    targ = os.path.join(target_dir, 'demo')
+    if not os.path.exists(targ):
+        shutil.copytree(demo_dir, targ)
 
 if __name__ == "__main__":
     import sys
