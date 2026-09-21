@@ -1,4 +1,4 @@
-"""
+b"""
 Generate conformers for alanine dipeptide (Ace-Ala-NMe) with
 `Psience.Molecools.Molecule`, round-trip them through an XYZ file and
 `ase`, and visualize a structure with a metallic-looking x3d render.
@@ -58,7 +58,8 @@ import ase.io
 # N-acetyl-alanine-N'-methylamide ("Ace-Ala-NMe"), i.e. alanine dipeptide,
 # the standard minimal model peptide used for phi/psi (Ramachandran)
 # conformer studies.
-ALANINE_DIPEPTIDE_SMILES = "CC(=O)NC(C)C(=O)NC"
+ALANINE_DIPEPTIDE_SMILES = "CC(=O)N[C@@H](C)C(=O)NC"
+# ALANINE_DIPEPTIDE_SMILES = "CC(=O)N[CH](C)C(=O)NC"
 
 DEFAULT_XYZ_FILE = "alanine_dipeptide_conformers.xyz"
 
