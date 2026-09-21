@@ -19,3 +19,4 @@ dependencies:
       - torch-cluster
       - pymatgen
       - mace-torch
+      - sella
