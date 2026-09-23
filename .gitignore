@@ -139,5 +139,5 @@ ci/tests/TestData/h2o_aimd.log
 ci/tests/TestData/h2o_aimd.log
 *.o
 
-*.model
-*.jpt
+#*.model
+#*.jpt
