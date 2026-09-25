@@ -10,6 +10,7 @@ dependencies:
       - ase
       - pysisyphus
       - orjson
+      - sella
       - mccoygroup-mcutils
       - mccoygroup-psience
       - rdkit
