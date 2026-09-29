@@ -11,8 +11,8 @@ dependencies:
       - pysisyphus
       - orjson
       - sella
-      - mccoygroup-mcutils
-      - mccoygroup-psience
+      - git+https://github.com/McCoyGroup/McUtils.git
+      - git+https://github.com/McCoyGroup/Psience.git
       - rdkit
       - --extra-index-url https://download.pytorch.org/whl/cpu
       - torch==2.8.0
