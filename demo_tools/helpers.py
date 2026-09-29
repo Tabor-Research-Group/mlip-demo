@@ -3,8 +3,10 @@ import stat
 import shutil
 from pathlib import Path
 from datetime import datetime
-import sys
+import sys, os
 import uuid
+
+os.environ['TORCH_COMPILE_DISABLE'] = '1'
 
 def start_exercise():
     """Create a fresh output directory."""

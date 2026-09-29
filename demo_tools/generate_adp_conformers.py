@@ -51,7 +51,10 @@ re-derive it):
 import os
 
 from Psience.Molecools import Molecule
-from McUtils.ExternalPrograms import ASEMolecule
+if __package__:
+    from .view_mols import view as visualize
+else:  # direct execution: python demo_tools/generate_adp_conformers.py
+    from view_mols import view as visualize
 
 import ase.io
 
@@ -157,56 +160,6 @@ def load_mols(file=DEFAULT_XYZ_FILE):
     return ase.io.read(file, index=":")
 
 
-default_visualization_styles = dict(
-    backend='x3d',
-    background='white',
-    navigation={'headlight':True},
-    environment={'reflectionIntensity': 1.0},
-    atom_style={'ambientIntensity': 0.2, 'specularColor': (0.38, 0.38, 0.38), 'shininess': 0.32},
-    bond_style={'ambientIntensity': 0.2, 'specularColor': (0.38, 0.38, 0.38), 'shininess': 0.32},
-    lighting=[
-        {'direction': (-0.45, -0.65, -1.0), 'color': (1.0, 0.98, 0.95),
-         'intensity': 0.2, 'ambientIntensity': 0.16, 'global': True},
-        {'direction': (0.70, 0.20, -1.0), 'color': (0.90, 0.94, 1.0),
-         'intensity': 0.2, 'ambientIntensity': 0.05, 'global': True},
-    ],
-)
-def visualize(atoms, out_file=None, **plot_opts):
-    """
-    Convert an `ase.Atoms` object into a `Molecule` (via
-    `McUtils.ExternalPrograms.ASEMolecule` -> `Molecule.from_ase`) and plot
-    it with a metallic-looking material on the `x3d` backend.
-
-    :param atoms: the structure to visualize
-    :type atoms: ase.Atoms
-    :param out_file: if given, the figure is saved here (e.g. an `.html`
-        path) instead of being shown interactively -- useful outside of a
-        notebook
-    :type out_file: str | None
-    :param backend: the `Molecule.plot` rendering backend
-    :type backend: str
-    :param metallic: `metallicFactor` (0-1) applied to atoms/bonds; higher
-        is more metal-like
-    :type metallic: float
-    :param roughness: `roughnessFactor` (0-1) applied to atoms/bonds;
-        lower is glossier/more mirror-like
-    :type roughness: float
-    :param plot_opts: extra options forwarded to `Molecule.plot`
-    :return: the constructed figure
-    """
-    ase_mol = ASEMolecule.from_atoms(atoms)
-    mol = Molecule.from_ase(ase_mol)
-
-    figure = mol.plot(
-        **(default_visualization_styles | plot_opts)
-    )
-
-    if out_file is not None:
-        figure.savefig(out_file)
-    # else:
-    #     figure.show()
-
-    return figure
 
 
 if __name__ == "__main__":
