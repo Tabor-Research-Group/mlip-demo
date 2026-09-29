@@ -3,4 +3,5 @@
 **/.ipynb_checkpoints/
 #models/*.model
 **/vib/
-**/.vib*
+**/*.vib*
+**/irc.traj
