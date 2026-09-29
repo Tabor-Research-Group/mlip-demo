@@ -149,8 +149,6 @@ def repair_fragmented_molecules(
     atoms: Atoms,
     bond_scale: float = 1.15,
     neighbor_skin: float = 0.0,
-    centroid_position_frac: np.ndarray = None,
-    # return_components=False,
     ) -> Atoms:
     """
     Repair molecules fragmented across periodic boundaries.
@@ -177,24 +175,22 @@ def repair_fragmented_molecules(
 
     new_positions = repaired.positions.copy()
     
-    for comp_idx, comp in enumerate(components):
+    cell = repaired.cell.array
+    pbc = np.asarray(repaired.pbc, dtype=bool)
+
+    for comp in components:
         if len(comp) == 1:
-            continue
+            unwrapped = repaired.positions[comp].copy()
+        else:
+            _, unwrapped = unwrap_component(repaired, graph, comp)
 
-        atom_shifts, unwrapped = unwrap_component(repaired, graph, comp)
+        centroid_frac = np.linalg.solve(cell.T, unwrapped.mean(axis=0))
+        lattice_shift = np.zeros(3, dtype=int)
+        lattice_shift[pbc] = np.floor(centroid_frac[pbc]).astype(int)
 
-        for k, atom_idx in enumerate(comp):
-            new_positions[atom_idx] = unwrapped[k]
+        new_positions[comp] = unwrapped - lattice_shift @ cell
 
     repaired.positions[:] = new_positions
-
-    if centroid_position_frac is not None:
-        cell = repaired.cell.array
-        centroid_cart = np.mean(repaired.positions, axis=0)
-        centroid_frac = np.linalg.solve(cell.T, centroid_cart)
-        shift_frac = centroid_position_frac - centroid_frac
-        shift_cart = shift_frac @ cell
-        repaired.positions += shift_cart
 
     return repaired
 
