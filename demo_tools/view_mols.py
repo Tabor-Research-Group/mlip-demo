@@ -3,7 +3,6 @@
 import numpy as np
 from ase import Atoms
 from McUtils.Data import UnitsData
-from McUtils.ExternalPrograms import ASEMolecule
 from Psience.Molecools import Molecule
 
 default_visualization_styles = dict(
@@ -57,7 +56,9 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
     repeating bond detection for conformers with the same atom ordering.
     """
     def convert(atoms):
-        return Molecule.from_ase(ASEMolecule.from_atoms(atoms))
+        # Visualization needs geometry, not ASE trajectory/calculator metadata.
+        return Molecule(atoms.get_chemical_symbols(),
+                        atoms.positions * UnitsData.convert('Angstroms', 'BohrRadius'))
 
     def finish(figure):
         if out_file is not None:
@@ -66,8 +67,18 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
 
     options = {**default_visualization_styles, **plot_options,
                "backend": "x3d", "return_objects": False}
+
+    def plot(mol, *geometries, **extra):
+        opts = {**options, **extra}
+        bonds = opts.get('bonds')
+        if bonds is None or bonds is True:
+            bonds = mol.bonds
+        if bonds is not None and bonds is not False and len(bonds) == 0:
+            opts['bonds'] = False  # Psience cannot render an empty bond list.
+        return mol.plot(*geometries, **opts)
+
     if isinstance(structures, Atoms):
-        return finish(convert(structures).plot(**options))
+        return finish(plot(convert(structures)))
 
     structures = list(structures)
     if not structures:
@@ -79,7 +90,7 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
         first = convert(structures[0])
         frames = np.stack([atoms.positions for atoms in structures])
         frames *= UnitsData.convert('Angstroms', 'BohrRadius')
-        return finish(first.plot(frames, animate=True, **options))
+        return finish(plot(first, frames, animate=True))
 
     molecules = [convert(structures[0])]
     for atoms in structures[1:]:
@@ -88,7 +99,7 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
             mol.bonds = molecules[0].bonds
         molecules.append(mol)
     if combine:
-        return finish(combine_molecules(molecules).plot(**options))
+        return finish(plot(combine_molecules(molecules)))
     if out_file is not None:
         raise ValueError("out_file requires one structure, combine=True, or animate=True")
-    return [mol.plot(**options) for mol in molecules]
+    return [plot(mol) for mol in molecules]
