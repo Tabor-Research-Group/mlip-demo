@@ -5,15 +5,47 @@ from pathlib import Path
 from datetime import datetime
 import sys, os
 import uuid
+import errno
+import tempfile
 
 os.environ['TORCH_COMPILE_DISABLE'] = '1'
 
+def configure_aimnet_cache(data_dir=None):
+    """Keep model downloads writable, retaining access to preloaded weights."""
+    data_dir = Path.cwd() if data_dir is None else Path(data_dir)
+    fallback = data_dir.resolve().parent / '.cache' / 'aimnet'
+    inherited = os.environ.get('AIMNET_CACHE_DIR')
+    cache = Path(inherited).expanduser().resolve() if inherited else fallback
+    try:
+        cache.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryFile(dir=cache):
+            pass
+    except OSError as exc:
+        if exc.errno not in (errno.EACCES, errno.EPERM, errno.EROFS) or cache == fallback:
+            raise
+        readonly_cache = cache
+        cache = fallback
+        cache.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryFile(dir=cache):
+            pass
+        # The image's immutable weights stay usable without copying or downloading.
+        for model in readonly_cache.glob('*'):
+            if model.is_file() and model.suffix in ('.pt', '.jpt'):
+                try:
+                    (cache / model.name).symlink_to(model)
+                except FileExistsError:
+                    pass  # Preserve weights already downloaded into this cache.
+    os.environ['AIMNET_CACHE_DIR'] = str(cache)
+    return cache
+
+
 def start_exercise():
-    """Create a fresh output directory."""
-    data = Path(__file__).cwd()
+    """Configure a writable model cache and create a fresh output directory."""
+    data = Path.cwd()
+    cache = configure_aimnet_cache(data)
     output = data / 'results' / (datetime.now().strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:6])
     output.mkdir(parents=True, exist_ok=False)
-    print(f'Python: {sys.executable}\nInputs: {data}\nNew results: {output}')
+    print(f'Python: {sys.executable}\nInputs: {data}\nAIMNet cache: {cache}\nNew results: {output}')
     return data, output
 
 def configure_cli(target_dir='.', templates_dir=None):

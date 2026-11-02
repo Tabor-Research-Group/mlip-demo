@@ -56,11 +56,11 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
     repeating bond detection for conformers with the same atom ordering.
 
     Static structures with any periodic boundary use ``PeriodicSystem.plot``
-    with their ASE cell and periodicity. Cell edges, lattice axes, and one
-    layer of neighboring cells along each periodic direction are shown by
-    default; override ``draw_cell``, ``unit_axes``, ``periodic_images``, or
-    ``show_periodic_images`` through plot options. Combined views and
-    trajectories retain the molecular renderer and do not repeat cells.
+    with their ASE cell and periodicity. Only the unit cell is shown by
+    default, with cell edges and lattice axes. Enable neighboring cells with
+    ``show_periodic_images=True`` or explicit ``periodic_images`` counts;
+    override ``draw_cell`` and ``unit_axes`` through plot options. Combined
+    views and trajectories retain the molecular renderer and do not repeat cells.
     """
     def convert(atoms):
         # Visualization needs geometry, not ASE trajectory/calculator metadata.
@@ -86,7 +86,6 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
             )
             opts.setdefault('draw_cell', True)
             opts.setdefault('unit_axes', True)
-            opts.setdefault('periodic_images', periodic_atoms.pbc.astype(int).tolist())
             return periodic.plot(**opts)
 
         bonds = opts.get('bonds')
