@@ -1,4 +1,4 @@
-"""View ASE structures with Psience's X3D molecular plotter."""
+"""View ASE structures with Psience's X3D molecular and periodic plotters."""
 
 import numpy as np
 from ase import Atoms
@@ -48,12 +48,19 @@ combine_mols = combine_molecules
 
 def view(structures, *, combine=False, animate=False, reuse_bonds=False,
          out_file=None, **plot_options):
-    """Plot ASE structures through ``Molecule.plot`` on the X3D backend.
+    """Plot ASE structures through Psience on the X3D backend.
 
     A single ``Atoms`` returns one figure. A list returns one figure per
     structure, unless ``combine=True`` requests one overlaid structure or
     ``animate=True`` requests one trajectory. ``reuse_bonds=True`` avoids
     repeating bond detection for conformers with the same atom ordering.
+
+    Static structures with any periodic boundary use ``PeriodicSystem.plot``
+    with their ASE cell and periodicity. Cell edges, lattice axes, and one
+    layer of neighboring cells along each periodic direction are shown by
+    default; override ``draw_cell``, ``unit_axes``, ``periodic_images``, or
+    ``show_periodic_images`` through plot options. Combined views and
+    trajectories retain the molecular renderer and do not repeat cells.
     """
     def convert(atoms):
         # Visualization needs geometry, not ASE trajectory/calculator metadata.
@@ -68,8 +75,20 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
     options = {**default_visualization_styles, **plot_options,
                "backend": "x3d", "return_objects": False}
 
-    def plot(mol, *geometries, **extra):
+    def plot(mol, *geometries, periodic_atoms=None, **extra):
         opts = {**options, **extra}
+        if periodic_atoms is not None and np.any(periodic_atoms.pbc):
+            from Psience.Molecools import PeriodicSystem
+
+            periodic = PeriodicSystem(
+                mol, periodic_atoms.cell.array,
+                lattice_units='Angstroms', periodicity=periodic_atoms.pbc,
+            )
+            opts.setdefault('draw_cell', True)
+            opts.setdefault('unit_axes', True)
+            opts.setdefault('periodic_images', periodic_atoms.pbc.astype(int).tolist())
+            return periodic.plot(**opts)
+
         bonds = opts.get('bonds')
         if bonds is None or bonds is True:
             bonds = mol.bonds
@@ -78,7 +97,7 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
         return mol.plot(*geometries, **opts)
 
     if isinstance(structures, Atoms):
-        return finish(plot(convert(structures)))
+        return finish(plot(convert(structures), periodic_atoms=structures))
 
     structures = list(structures)
     if not structures:
@@ -102,4 +121,5 @@ def view(structures, *, combine=False, animate=False, reuse_bonds=False,
         return finish(plot(combine_molecules(molecules)))
     if out_file is not None:
         raise ValueError("out_file requires one structure, combine=True, or animate=True")
-    return [plot(mol) for mol in molecules]
+    return [plot(mol, periodic_atoms=atoms)
+            for mol, atoms in zip(molecules, structures)]
