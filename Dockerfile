@@ -9,7 +9,6 @@ RUN printf '%s\n' \
 
 WORKDIR /home
 
-ARG CACHEBUST
 COPY environment.yml environment-mace.yml environment-uma.yml ./
 RUN apt-get update && apt-get -y install --no-install-recommends git gcc g++ && \
     mamba env create -f environment.yml && \
