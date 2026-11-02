@@ -19,6 +19,12 @@ RUN apt-get update && apt-get -y install --no-install-recommends git gcc g++ && 
     find /opt/conda -follow -type f -name '*.pyc' -delete && \
     find /opt/conda -follow -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
+# Cache the default AIMNet2 weights outside user home directories.
+ENV AIMNET_CACHE_DIR=/opt/aimnet-models
+RUN /opt/conda/envs/aimnet2/bin/python -c \
+    "from aimnet.calculators.model_registry import get_model_path; print(get_model_path('aimnet2'))" && \
+    chmod -R a+rX "$AIMNET_CACHE_DIR"
+
 ARG CACHEBUST
 COPY cli.py ./
 COPY kernels /usr/local/share/jupyter/kernels/
